@@ -1,0 +1,5 @@
+﻿route_id,trip_id,trip_headsign,trip_arabic_headsign
+1,B1,Raml-Nasr-1,الرمل-النصر-1
+2,B2,Raml-Nasr-2,الرمل-النصر-2
+1,Y1,San Stefano-Ibrahim Mosque-1,سان ستيفانو-القائد ابراهيم-1
+2,Y2,San Stefano-Ibrahim Mosque-2,سان ستيفانو-القائد ابراهيم-2
