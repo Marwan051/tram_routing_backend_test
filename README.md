@@ -21,5 +21,5 @@ docker run -d -p 3000:3000 tram_routing_server_test
 https://127.0.0.1:3000/getPath?start={start_station}&end={end_station}&mode={mode}
 ```
 
-replace {start_station} and {end_station} with values from gtfs/stops.txt
+replace {start_station} and {end_station} with id values from gtfs/stops.txt
 replace {mode} with either "precomputed" or "realtime"
