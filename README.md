@@ -1,8 +1,7 @@
 ## To create the docker image run :
 
 ```bash
-docker build -t tram_routing_server_te
-st .
+docker build -t tram_routing_server_test .
 ```
 
 ---
