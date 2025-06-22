@@ -87,24 +87,6 @@ func getPathHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Access the "optimalRoute" field if mode is "precomputed"
-	if mode == "precomputed" {
-		optimalRoute, ok := result["optimalRoute"]
-		if !ok {
-			log.Printf("optimalRoute not found in response: %v", result)
-			http.Error(w, "optimalRoute not found in routing engine response", http.StatusInternalServerError)
-			return
-		}
-
-		// Marshal the "optimalRoute" field back to JSON
-		data, err = json.Marshal(optimalRoute)
-		if err != nil {
-			log.Printf("failed to marshal optimalRoute: %v", err)
-			http.Error(w, "failed to process optimalRoute", http.StatusInternalServerError)
-			return
-		}
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	w.Write(data)
 }
