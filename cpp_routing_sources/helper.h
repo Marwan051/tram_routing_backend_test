@@ -195,85 +195,98 @@ private:
         }
     }
     private:
-    vector<RouteStep> generateShortSteps(long long srcId, long long destId, 
-                                       const vector<pair<long long, string>>& path) {
-        vector<RouteStep> steps;
-        if (path.empty()) return steps;
+vector<RouteStep> generateShortSteps(long long srcId, long long destId, 
+                                   const vector<pair<long long, string>>& path) {
+    vector<RouteStep> steps;
+    if (path.empty()) return steps;
 
-        // Board at first station
-        steps.push_back({
-            "board", path[0].first, stationNames[path[0].first], path[0].second, linePrices[path[0].second]
-        });
+    // Board at first station
+    steps.push_back({
+        "board", path[0].first, stationNames[path[0].first], path[0].second, linePrices[path[0].second]
+    });
 
-        string currentLine = path[0].second;
+    string currentLine = path[0].second;
+    long long lastStation = path[0].first;
+    
+    for (size_t i = 1; i < path.size(); i++) {
+        auto [stationId, line] = path[i];
         
-        for (size_t i = 1; i < path.size(); i++) {
-            auto [stationId, line] = path[i];
+        // If line changes, we need to transfer at previous station
+        if (line != currentLine) {
+            // Add transfer step at previous station
+            steps.push_back({
+                "transfer", lastStation, stationNames[lastStation], 
+                currentLine + " -> " + line, 0
+            });
+            currentLine = line;
             
-            // Handle line changes
-            if (line != currentLine) {
-                steps.push_back({
-                    "transfer", stationId, stationNames[stationId], currentLine + " -> " + line, 0
-                });
-                steps.push_back({
-                    "board", stationId, stationNames[stationId], line, linePrices[line]
-                });
-                currentLine = line;
-            }
-            
-            // Last station is always arrive
+            // If this is the last station, arrive
             if (i == path.size() - 1) {
                 steps.push_back({
                     "arrive", stationId, stationNames[stationId], currentLine, 0
                 });
             }
+        } 
+        // Last station on current line
+        else if (i == path.size() - 1) {
+            steps.push_back({
+                "arrive", stationId, stationNames[stationId], currentLine, 0
+            });
         }
-
-        return steps;
+        
+        lastStation = stationId;
     }
 
-    vector<RouteStep> generateFullSteps(long long srcId, long long destId,
-                                      const vector<pair<long long, string>>& path) {
-        vector<RouteStep> steps;
-        if (path.empty()) return steps;
+    return steps;
+}
+vector<RouteStep> generateFullSteps(long long srcId, long long destId,
+                                  const vector<pair<long long, string>>& path) {
+    vector<RouteStep> steps;
+    if (path.empty()) return steps;
 
-        // Board at first station
-        steps.push_back({
-            "board", path[0].first, stationNames[path[0].first], path[0].second, linePrices[path[0].second]
-        });
+    // Board at first station
+    steps.push_back({
+        "board", path[0].first, stationNames[path[0].first], path[0].second, linePrices[path[0].second]
+    });
 
-        string currentLine = path[0].second;
+    string currentLine = path[0].second;
+    
+    for (size_t i = 1; i < path.size(); i++) {
+        auto [stationId, line] = path[i];
         
-        for (size_t i = 1; i < path.size(); i++) {
-            auto [stationId, line] = path[i];
+        // Check if line changes (transfer happens at previous station)
+        if (line != currentLine) {
+            // Add transfer step at previous station
+            steps.push_back({
+                "transfer", path[i-1].first, stationNames[path[i-1].first], 
+                currentLine + " -> " + line, 0
+            });
+            currentLine = line;
             
-            // Handle line changes
-            if (line != currentLine) {
-                steps.push_back({
-                    "transfer", stationId, stationNames[stationId], currentLine + " -> " + line, 0
-                });
-                steps.push_back({
-                    "board", stationId, stationNames[stationId], line, linePrices[line]
-                });
-                currentLine = line;
-            }
-            // Intermediate stations (not last)
-            else if (i < path.size() - 1) {
+            // If this isn't the last station, add pass for current station
+            if (i < path.size() - 1) {
                 steps.push_back({
                     "pass", stationId, stationNames[stationId], currentLine, 0
                 });
             }
-            
-            // Last station is always arrive
-            if (i == path.size() - 1) {
-                steps.push_back({
-                    "arrive", stationId, stationNames[stationId], currentLine, 0
-                });
-            }
+        } 
+        // Intermediate station on same line
+        else if (i < path.size() - 1) {
+            steps.push_back({
+                "pass", stationId, stationNames[stationId], currentLine, 0
+            });
         }
-
-        return steps;
+        
+        // Last station is always arrive
+        if (i == path.size() - 1) {
+            steps.push_back({
+                "arrive", stationId, stationNames[stationId], currentLine, 0
+            });
+        }
     }
+
+    return steps;
+}
     vector<DirectRoute> findDirectRoutes(long long srcId, long long destId) {
         vector<DirectRoute> directRoutes;
 
